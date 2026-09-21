@@ -1,0 +1,11 @@
+name: pending-specs-digest
+description: Reporta specs pendientes de QA
+schedule: "0 10 * * *"
+delivery: telegram
+prompt: |
+  Revisá el estado del pipeline de QA:
+  1. Specs con qa-report.md generado en las últimas 24h
+  2. Specs en odd/specs/ o openspec/changes/ sin qa-report.md
+  3. Specs con veredicto FAIL que necesitan volver a intake-sdd
+  4. Specs con veredicto PASS_WITH_CONCERNS pendientes de corrección
+  No publiques nada. Solo informá el estado.

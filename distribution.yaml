@@ -1,0 +1,8 @@
+name: spec-qa
+version: 1.0.0
+description: "QA pipeline for SDD specs — validates acceptance criteria, finds edge cases, evaluates risks, checks consistency. Consumes specs from intake-sdd."
+hermes_requires: ">=0.12.0"
+author: "Lisandro Cacciatore"
+env:
+  - HERMES_MODEL
+  - DEEPSEEK_API_KEY
