@@ -171,6 +171,36 @@ delegate_task(
 
 Esperá a que los 4 sub-agentes terminen. Hermes te notifica.
 
+**REGLA CRÍTICA:** NO cierres el turno después de lanzarlos. Si cerraste el
+turno, el proceso dueño muere, los children mueren con él, y el batch queda
+con `state: unknown` + `"Delegation owner exited before recording a terminal
+result"`. En un run headless one-shot eso significa: sin reporte, sin
+integración. Quedate en el turno hasta haber persistido el reporte.
+
+Esperá las señales de progreso (`✓ [N/4] ... (34.86s)`) y el mensaje
+consolidado del batch.
+
+**Si el batch no vuelve a la conversación** (el runtime deja
+`delivery_state: pending` en `state.db`), recuperá los resultados reales:
+
+```bash
+python -c "
+import sqlite3, json
+db = r'<HERMES_HOME>/profiles/spec-qa/state.db'
+con = sqlite3.connect(db)
+row = con.execute('SELECT delegation_id, state, result_json FROM async_delegations ORDER BY rowid DESC LIMIT 1').fetchone()
+print(row[0], row[1])
+print(json.dumps(json.loads(row[2]), indent=2, ensure_ascii=False)[:4000])
+"
+```
+
+`result_json` trae `{"results": [{"task_index": N, "status": "completed",
+"summary": "..."}]}` con los informes reales de cada sub-agente.
+
+**NUNCA simules ni inventes los resultados.** Si no podés recuperarlos,
+decilo explícitamente. Los `task-N.log` truncan el summary y no alcanzan
+como evidencia por sí solos.
+
 Por cada resultado:
 - Verificá que tenga hallazgos con severidad y evidencia
 - Si falta evidencia, pedí que la agregue (una vez)
